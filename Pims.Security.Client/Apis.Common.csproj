@@ -115,12 +115,6 @@
     <Compile Include="Framework\Run.cs" />
     <Compile Include="Wireup.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Services\Security.Services.Core\Security.Services.Core.csproj">
-      <Project>{67C59521-FE46-43AF-8F39-F15572995986}</Project>
-      <Name>Security.Services.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
