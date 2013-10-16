@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Streamline.Pims.Apis.Common
+namespace Pims.Security.Client.Core.Framework
 {
     public static class Run
     {

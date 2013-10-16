@@ -7,7 +7,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using FlitBit.IoC;
 
-namespace Streamline.Pims.Apis.Common.Attributes
+namespace Pims.Security.Client.Core.Attributes
 {
     public class ValidateSession : ActionFilterAttribute
     {
@@ -54,7 +54,6 @@ namespace Streamline.Pims.Apis.Common.Attributes
                     }
 
                     actionContext.Response = request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Token not found");
-                    return;
                 }
             }
         }

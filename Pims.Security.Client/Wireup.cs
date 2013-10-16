@@ -1,11 +1,10 @@
-﻿using System.Configuration;
-using FlitBit.IoC;
-using FlitBit.Wireup;
+﻿using FlitBit.Wireup;
 using FlitBit.Wireup.Meta;
+using Pims.Security.Client.Core;
 
 [assembly: WireupDependency(typeof(FlitBit.IoC.AssemblyWireup))]
-[assembly: Wireup(typeof(Streamline.Pims.Apis.Common.Wireup))]
-namespace Streamline.Pims.Apis.Common
+[assembly: Wireup(typeof(Wireup))]
+namespace Pims.Security.Client.Core
 {
     public class Wireup : IWireupCommand
     {
