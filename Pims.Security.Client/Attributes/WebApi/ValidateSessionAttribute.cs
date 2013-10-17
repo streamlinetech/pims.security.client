@@ -4,11 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
 using FlitBit.IoC;
+using ActionFilterAttribute = System.Web.Http.Filters.ActionFilterAttribute;
 
-namespace Pims.Security.Client.Core.Attributes
+namespace Pims.Security.Client.Core.Attributes.WebApi
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class ValidateSessionAttribute : ActionFilterAttribute
     {
         public string Abilities { get; set; }

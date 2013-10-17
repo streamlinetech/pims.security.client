@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pims.Security.Client.Core", "Pims.Security.Client.Core.csproj", "{A6FE818C-1916-4627-86E7-C23E6C6F7CD8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Streamline.Pims.Security.Client", "Streamline.Pims.Security.Client.csproj", "{A6FE818C-1916-4627-86E7-C23E6C6F7CD8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6992B59F-B490-49EE-8857-7AF458ED466C}"
 	ProjectSection(SolutionItems) = preProject

@@ -2,14 +2,27 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Dynamic;
+using System.Linq;
 using System.Net;
+using System.Web;
 using FlitBit.Core.Net;
 using FlitBit.IoC.Meta;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Utilities.DataTypes.ExtensionMethods;
 
 namespace Pims.Security.Client.Core
 {
     public interface IAuthorizationClient
     {
+        /// <summary>
+        /// Authorizes a user, will parse the http headers and try to find a token
+        /// </summary>
+        /// <param name="abilities">The names of the abilities</param>
+        /// <param name="isTokenInHttpHeader">[Optional] Determines if the token is in the http header or in cookies (Default is true)</param>
+        /// <returns>True if the user is in the ability, false if they aren't</returns>
+        bool Authorize(IEnumerable<string> abilities, bool isTokenInHttpHeader = true);
+
         /// <summary>
         /// Authorize a user
         /// </summary>
@@ -47,9 +60,15 @@ namespace Pims.Security.Client.Core
     [ContainerRegister(typeof(IAuthorizationClient), RegistrationBehaviors.Default)]
     public class AuthorizationClient : IAuthorizationClient
     {
+        const string TokenName = "token";
+        const string HttpHeaderName = "Authorization";
+
         public string AuthorizationUrl { get; private set; }
         public string UsersUrl { get; private set; }
         
+        readonly JsonSerializerSettings _serializerSettings;
+        
+
         public virtual Uri ActiveDirectoryAuthorizationUrl
         {
             get
@@ -57,7 +76,7 @@ namespace Pims.Security.Client.Core
                 return new Uri(AuthorizationUrl + "/providers/activedirectory");
             }
         }
-        
+
         public virtual Uri SecurityBadgeAuthorizationUrl
         {
             get
@@ -65,7 +84,7 @@ namespace Pims.Security.Client.Core
                 return new Uri(AuthorizationUrl + "/providers/badge");
             }
         }
-        
+
         public virtual Uri SessionsAuthorizationUrl
         {
             get
@@ -78,11 +97,54 @@ namespace Pims.Security.Client.Core
         {
             AuthorizationUrl = ConfigurationManager.AppSettings["api_authorization"];
             UsersUrl = ConfigurationManager.AppSettings["api_users"];
+
+            _serializerSettings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+        }
+
+        public bool Authorize(IEnumerable<string> abilities, bool isTokenInHttpHeader = true)
+        {
+            var httpContext = HttpContext.Current;
+            if (httpContext == null)
+                return false;
+
+            var request = httpContext.Request;
+            var token = string.Empty;
+
+
+            if (isTokenInHttpHeader)
+            {
+                if (!request.Headers.AllKeys.Any(h => h.Equals(HttpHeaderName, StringComparison.OrdinalIgnoreCase)) || // Ensure authorization is an http header
+                    new[] { "HEAD", "OPTIONS", "TRACE" }.Any(m => m.Equals(request.HttpMethod, StringComparison.OrdinalIgnoreCase)))  // Ensure request is not a cors request or trace request
+                {
+                    return false;
+                }
+
+                token = request.Headers[HttpHeaderName];
+            }
+            else
+            {
+                if (!request.Cookies.AllKeys.Any(c => c.Equals(TokenName, StringComparison.OrdinalIgnoreCase)))
+                    return false;
+
+                var rawToken = JsonConvert.DeserializeObject<dynamic>(request.Cookies[TokenName].Value, _serializerSettings);
+                if (string.IsNullOrEmpty(rawToken.token))
+                    return false;
+
+                token = rawToken.token;
+            }
+            
+            return Authorize(token, abilities);
         }
 
         public virtual bool Authorize(string token, IEnumerable<string> abilities)
         {
-            if (!VaildateToken(token)) return false;
+            if (!ValidateToken(token)) return false;
 
             dynamic authorizationRequest = new ExpandoObject();
             authorizationRequest.token = token;
@@ -140,11 +202,9 @@ namespace Pims.Security.Client.Core
             return responseStatusCode != HttpStatusCode.Forbidden && responseStatusCode != HttpStatusCode.Unauthorized;
         }
 
-        bool VaildateToken(string token)
+        bool ValidateToken(string token)
         {
-            if (string.IsNullOrEmpty(token))
-                return false;
-            return true;
+            return !string.IsNullOrEmpty(token);
         }
     }
 }
