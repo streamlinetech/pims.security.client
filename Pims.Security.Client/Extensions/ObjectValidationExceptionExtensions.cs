@@ -1,7 +1,7 @@
 ﻿using System.Web.Http.ModelBinding;
 using RedRocket.Utilities.Core.Validation;
 
-namespace Pims.Security.Client.Core.Extensions
+namespace Streamline.Pims.Security.Client.Extensions
 {
     public static class ObjectValidationExceptionExtensions
     {

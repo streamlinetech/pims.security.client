@@ -9,9 +9,8 @@ using FlitBit.Core.Net;
 using FlitBit.IoC.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using Utilities.DataTypes.ExtensionMethods;
 
-namespace Pims.Security.Client.Core
+namespace Streamline.Pims.Security.Client
 {
     public interface IAuthorizationClient
     {

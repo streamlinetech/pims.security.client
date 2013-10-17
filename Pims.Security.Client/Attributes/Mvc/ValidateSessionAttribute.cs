@@ -4,9 +4,9 @@ using System.Linq;
 using System.Web.Mvc;
 using FlitBit.IoC;
 
-namespace Pims.Security.Client.Core.Attributes.Mvc
+namespace Streamline.Pims.Security.Client.Attributes.Mvc
 {
-    [AttributeUsageAttribute(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class ValidateSessionMvcAttribute : ActionFilterAttribute
     {
         readonly string _redirectUrl;
