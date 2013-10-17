@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web;
 using System.Web.Util;
 using FlitBit.Core.Net;
@@ -180,7 +181,7 @@ namespace Streamline.Pims.Security.Client
             dynamic authorizationRequest = new ExpandoObject();
             authorizationRequest.credentials = new ExpandoObject();
             authorizationRequest.credentials.username = username;
-            authorizationRequest.credentials.username = password;
+            authorizationRequest.credentials.password = password;
             authorizationRequest.abilities = abilities;
 
             return PerformAuthorizationRequest(authorizationRequest, ActiveDirectoryAuthorizationUrl);
@@ -188,22 +189,19 @@ namespace Streamline.Pims.Security.Client
 
         bool PerformAuthorizationRequest(ExpandoObject request, Uri uri)
         {
-            var responseStatusCode = HttpStatusCode.OK;
+            var responseStatusCode = HttpStatusCode.Forbidden;
 
             uri.MakeResourceRequest()
                 .HttpPostJson(request,
                     (exception, response) =>
                     {
                         if (response != null)
+                        {
                             responseStatusCode = response.StatusCode;
+                        }
                     });
 
-            return EnsureResponseIsNotForbiddenAndUnauthorized(responseStatusCode);
-        }
-
-        bool EnsureResponseIsNotForbiddenAndUnauthorized(HttpStatusCode responseStatusCode)
-        {
-            return responseStatusCode != HttpStatusCode.Forbidden && responseStatusCode != HttpStatusCode.Unauthorized;
+            return responseStatusCode == HttpStatusCode.OK;
         }
 
         bool ValidateToken(string token)
