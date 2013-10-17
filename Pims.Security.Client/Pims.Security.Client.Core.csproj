@@ -109,7 +109,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\ValidateSession.cs" />
+    <Compile Include="Attributes\ValidateSessionAttribute.cs" />
     <Compile Include="AuthorizationClient.cs" />
     <Compile Include="Extensions\ObjectValidationExceptionExtensions.cs" />
     <Compile Include="Framework\Run.cs" />
