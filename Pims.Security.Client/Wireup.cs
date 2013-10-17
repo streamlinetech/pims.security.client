@@ -3,6 +3,7 @@ using FlitBit.Wireup.Meta;
 using Pims.Security.Client.Core;
 
 [assembly: WireupDependency(typeof(FlitBit.IoC.AssemblyWireup))]
+[assembly: WireupDependency(typeof(FlitBit.Dto.AssemblyWireup))]
 [assembly: Wireup(typeof(Wireup))]
 namespace Pims.Security.Client.Core
 {
@@ -10,7 +11,6 @@ namespace Pims.Security.Client.Core
     {
         public void Execute(IWireupCoordinator coordinator)
         {
-            
         }
     }
 }

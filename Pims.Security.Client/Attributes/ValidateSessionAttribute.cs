@@ -9,14 +9,14 @@ using FlitBit.IoC;
 
 namespace Pims.Security.Client.Core.Attributes
 {
-    public class ValidateSession : ActionFilterAttribute
+    public class ValidateSessionAttribute : ActionFilterAttribute
     {
         public string Abilities { get; set; }
         public Guid ApplicationId { get; set; }
 
         IEnumerable<string> ParsedAbilities { get; set; }
 
-        public ValidateSession()
+        public ValidateSessionAttribute()
         {
             //ApplicationId = Guid.Parse(applicationId);
             ParsedAbilities = !string.IsNullOrEmpty(Abilities) ?
@@ -54,6 +54,7 @@ namespace Pims.Security.Client.Core.Attributes
                     }
 
                     actionContext.Response = request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Token not found");
+                    return;
                 }
             }
         }

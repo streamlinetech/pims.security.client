@@ -30,7 +30,7 @@ namespace Pims.Security.Client.Core
         /// Authorize a user
         /// </summary>
         /// <param name="abilities">The names of the abilities</param>
-        /// <param name="badge">The badge or security code TODO:  (Currently will not check against legacy)</param>
+        /// <param name="badge">The badge or security code</param>
         /// <returns>True if the user is in the ability, false if they aren't</returns>
         bool Authorize(IEnumerable<string> abilities, string badge);
 
@@ -49,6 +49,7 @@ namespace Pims.Security.Client.Core
     {
         public string AuthorizationUrl { get; private set; }
         public string UsersUrl { get; private set; }
+        
         public virtual Uri ActiveDirectoryAuthorizationUrl
         {
             get
@@ -56,6 +57,7 @@ namespace Pims.Security.Client.Core
                 return new Uri(AuthorizationUrl + "/providers/activedirectory");
             }
         }
+        
         public virtual Uri SecurityBadgeAuthorizationUrl
         {
             get
@@ -63,6 +65,7 @@ namespace Pims.Security.Client.Core
                 return new Uri(AuthorizationUrl + "/providers/badge");
             }
         }
+        
         public virtual Uri SessionsAuthorizationUrl
         {
             get
@@ -79,6 +82,8 @@ namespace Pims.Security.Client.Core
 
         public virtual bool Authorize(string token, IEnumerable<string> abilities)
         {
+            if (!VaildateToken(token)) return false;
+
             dynamic authorizationRequest = new ExpandoObject();
             authorizationRequest.token = token;
             authorizationRequest.abilities = abilities;
@@ -115,7 +120,6 @@ namespace Pims.Security.Client.Core
             return PerformAuthorizationRequest(authorizationRequest, ActiveDirectoryAuthorizationUrl);
         }
 
-
         bool PerformAuthorizationRequest(ExpandoObject request, Uri uri)
         {
             var responseStatusCode = HttpStatusCode.OK;
@@ -134,6 +138,13 @@ namespace Pims.Security.Client.Core
         bool EnsureResponseIsNotForbiddenAndUnauthorized(HttpStatusCode responseStatusCode)
         {
             return responseStatusCode != HttpStatusCode.Forbidden && responseStatusCode != HttpStatusCode.Unauthorized;
+        }
+
+        bool VaildateToken(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return false;
+            return true;
         }
     }
 }
