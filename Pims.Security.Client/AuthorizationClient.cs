@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Web;
+using System.Web.Util;
 using FlitBit.Core.Net;
 using FlitBit.IoC.Meta;
 using Newtonsoft.Json;
@@ -131,7 +132,9 @@ namespace Streamline.Pims.Security.Client
                 if (!request.Cookies.AllKeys.Any(c => c.Equals(TokenName, StringComparison.OrdinalIgnoreCase)))
                     return false;
 
-                var rawToken = JsonConvert.DeserializeObject<dynamic>(request.Cookies[TokenName].Value, _serializerSettings);
+                var decodedRawToken = httpContext.Server.UrlDecode(request.Cookies[TokenName].Value);
+
+                var rawToken = JsonConvert.DeserializeObject<dynamic>(decodedRawToken, _serializerSettings);
                 if (string.IsNullOrEmpty(rawToken.token))
                     return false;
 
