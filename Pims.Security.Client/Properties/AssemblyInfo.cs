@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Security Client")]
-[assembly: AssemblyDescription("Client and helpers to access security framework")]
+[assembly: AssemblyTitle("PIMS Security Client")]
+[assembly: AssemblyDescription("Authorization Client to access security framework.  Also includes MVC and Web Api helpers.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Streamline Technology")]
 [assembly: AssemblyProduct("PIMS")]
