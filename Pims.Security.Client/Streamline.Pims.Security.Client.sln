@@ -10,8 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6992B5
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Streamline.Pims.Security.Client.Tests", "..\Streamline.Pims.Security.Client.Tests\Streamline.Pims.Security.Client.Tests.csproj", "{AB553B9C-E211-42DD-A45C-3B4550F6F2F7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,12 +23,6 @@ Global
 		{A6FE818C-1916-4627-86E7-C23E6C6F7CD8}.NPC Stage|Any CPU.Build.0 = NPC Stage|Any CPU
 		{A6FE818C-1916-4627-86E7-C23E6C6F7CD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6FE818C-1916-4627-86E7-C23E6C6F7CD8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB553B9C-E211-42DD-A45C-3B4550F6F2F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB553B9C-E211-42DD-A45C-3B4550F6F2F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB553B9C-E211-42DD-A45C-3B4550F6F2F7}.NPC Stage|Any CPU.ActiveCfg = Release|Any CPU
-		{AB553B9C-E211-42DD-A45C-3B4550F6F2F7}.NPC Stage|Any CPU.Build.0 = Release|Any CPU
-		{AB553B9C-E211-42DD-A45C-3B4550F6F2F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB553B9C-E211-42DD-A45C-3B4550F6F2F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
