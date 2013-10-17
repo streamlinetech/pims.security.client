@@ -10,6 +10,7 @@ using FlitBit.Core.Net;
 using FlitBit.IoC.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Utilities.DataTypes.ExtensionMethods;
 
 namespace Streamline.Pims.Security.Client
 {
@@ -135,9 +136,10 @@ namespace Streamline.Pims.Security.Client
                 var decodedRawToken = httpContext.Server.UrlDecode(request.Cookies[TokenName].Value);
 
                 var rawToken = JsonConvert.DeserializeObject<dynamic>(decodedRawToken, _serializerSettings);
-                if (string.IsNullOrEmpty(rawToken.token))
-                    return false;
 
+                if (rawToken != null && rawToken.token != null && string.IsNullOrEmpty(rawToken.token.ToString()))
+                    return false;
+                
                 token = rawToken.token;
             }
             
