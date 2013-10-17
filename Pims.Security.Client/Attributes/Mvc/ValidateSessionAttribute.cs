@@ -7,7 +7,7 @@ using FlitBit.IoC;
 namespace Streamline.Pims.Security.Client.Attributes.Mvc
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class ValidateSessionMvcAttribute : ActionFilterAttribute
+    public class ValidateSessionAttribute : ActionFilterAttribute
     {
         readonly string _redirectUrl;
         public string Abilities { get; set; }
@@ -16,7 +16,7 @@ namespace Streamline.Pims.Security.Client.Attributes.Mvc
         IEnumerable<string> ParsedAbilities { get; set; }
 
 
-        public ValidateSessionMvcAttribute(string redirectUrl)
+        public ValidateSessionAttribute(string redirectUrl)
         {
             _redirectUrl = redirectUrl;
             AuthorizationClient = Create.New<IAuthorizationClient>();
