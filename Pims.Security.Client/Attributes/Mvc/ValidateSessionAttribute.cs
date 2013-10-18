@@ -13,21 +13,21 @@ namespace Streamline.Pims.Security.Client.Attributes.Mvc
         public string Abilities { get; set; }
 
         IAuthorizationClient AuthorizationClient { get; set; }
-        IEnumerable<string> ParsedAbilities { get; set; }
 
 
         public ValidateSessionAttribute(string redirectUrl)
         {
             _redirectUrl = redirectUrl;
             AuthorizationClient = Create.New<IAuthorizationClient>();
-            ParsedAbilities = !string.IsNullOrEmpty(Abilities) ?
-                 Abilities.Split(new char[','], StringSplitOptions.RemoveEmptyEntries) :
-                 Enumerable.Empty<string>();
         }
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (!AuthorizationClient.Authorize(ParsedAbilities, false))
+            var abilities = !string.IsNullOrEmpty(Abilities) ?
+                 Abilities.Split(new char[','], StringSplitOptions.RemoveEmptyEntries) :
+                 Enumerable.Empty<string>();
+
+            if (!AuthorizationClient.Authorize(abilities, false))
                 filterContext.Result = new RedirectResult(_redirectUrl);
         }
     }
