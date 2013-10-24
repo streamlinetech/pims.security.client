@@ -4,11 +4,14 @@ using System.Configuration;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web;
+using System.Web.Util;
 using FlitBit.Core.Net;
 using FlitBit.IoC.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Utilities.DataTypes.ExtensionMethods;
 
 namespace Streamline.Pims.Security.Client
 {
@@ -131,10 +134,13 @@ namespace Streamline.Pims.Security.Client
                 if (!request.Cookies.AllKeys.Any(c => c.Equals(TokenName, StringComparison.OrdinalIgnoreCase)))
                     return false;
 
-                var rawToken = JsonConvert.DeserializeObject<dynamic>(request.Cookies[TokenName].Value, _serializerSettings);
-                if (string.IsNullOrEmpty(rawToken.token))
-                    return false;
+                var decodedRawToken = httpContext.Server.UrlDecode(request.Cookies[TokenName].Value);
 
+                var rawToken = JsonConvert.DeserializeObject<dynamic>(decodedRawToken, _serializerSettings);
+
+                if (rawToken != null && rawToken.token != null && string.IsNullOrEmpty(rawToken.token.ToString()))
+                    return false;
+                
                 token = rawToken.token;
             }
             
@@ -175,7 +181,7 @@ namespace Streamline.Pims.Security.Client
             dynamic authorizationRequest = new ExpandoObject();
             authorizationRequest.credentials = new ExpandoObject();
             authorizationRequest.credentials.username = username;
-            authorizationRequest.credentials.username = password;
+            authorizationRequest.credentials.password = password;
             authorizationRequest.abilities = abilities;
 
             return PerformAuthorizationRequest(authorizationRequest, ActiveDirectoryAuthorizationUrl);
@@ -183,22 +189,19 @@ namespace Streamline.Pims.Security.Client
 
         bool PerformAuthorizationRequest(ExpandoObject request, Uri uri)
         {
-            var responseStatusCode = HttpStatusCode.OK;
+            var responseStatusCode = HttpStatusCode.Forbidden;
 
             uri.MakeResourceRequest()
                 .HttpPostJson(request,
                     (exception, response) =>
                     {
                         if (response != null)
+                        {
                             responseStatusCode = response.StatusCode;
+                        }
                     });
 
-            return EnsureResponseIsNotForbiddenAndUnauthorized(responseStatusCode);
-        }
-
-        bool EnsureResponseIsNotForbiddenAndUnauthorized(HttpStatusCode responseStatusCode)
-        {
-            return responseStatusCode != HttpStatusCode.Forbidden && responseStatusCode != HttpStatusCode.Unauthorized;
+            return responseStatusCode == HttpStatusCode.OK;
         }
 
         bool ValidateToken(string token)
