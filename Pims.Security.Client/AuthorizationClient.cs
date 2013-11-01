@@ -77,9 +77,9 @@ namespace Streamline.Pims.Security.Client
 
         public string AuthorizationUrl { get; private set; }
         public string UsersUrl { get; private set; }
-
+        
         readonly JsonSerializerSettings _serializerSettings;
-
+        
 
         public virtual Uri ActiveDirectoryAuthorizationUrl
         {
@@ -173,14 +173,14 @@ namespace Streamline.Pims.Security.Client
             var token = GetToken(isTokenInHttpHeader);
             if (token == null) return null;
 
-            var uri = new Uri(string.Format("{0}/user/{1}", UsersUrl, token));
+            var uri = new Uri(string.Format("{0}/user/{1}", UsersUrl, token)); 
             uri.MakeResourceRequest()
                 .HttpGet((exception, response) =>
                          {
                              if (response != null && response.StatusCode == HttpStatusCode.OK)
                              {
                                  dynamic dUser = response.DeserializeResponseAsDynamic();
-                                 user = Create.NewInit<IBasicUser>().Init(dUser);
+                                 user = Create.AsIf<IBasicUser>(dUser);
                              }
                          });
             return user;
