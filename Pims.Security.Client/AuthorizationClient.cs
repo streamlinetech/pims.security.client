@@ -11,6 +11,7 @@ using FlitBit.Core.Net;
 using FlitBit.IoC.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Streamline.Pims.Security.Client.Dtos;
 using Utilities.DataTypes.ExtensionMethods;
 
 namespace Streamline.Pims.Security.Client
@@ -57,6 +58,13 @@ namespace Streamline.Pims.Security.Client
         /// <param name="abilities">The names of the abilities</param>
         /// <returns>True if the user is in the ability, false if they aren't</returns>  
         bool Authorize(string username, string password, IEnumerable<string> abilities);
+
+        /// <summary>
+        /// Gets currently logged in user, will parse the http headers and try to find a token
+        /// </summary>
+        /// <param name="isTokenInHttpHeader">[Optional] Determines if the token is in the http header or in cookies (Default is true)</param>
+        /// <returns>The user if they are currently logged in, null if they aren't</returns>
+        IUser GetCurrentUser(bool isTokenInHttpHeader);
     }
 
     [ContainerRegister(typeof(IAuthorizationClient), RegistrationBehaviors.Default)]
@@ -111,39 +119,9 @@ namespace Streamline.Pims.Security.Client
 
         public bool Authorize(IEnumerable<string> abilities, bool isTokenInHttpHeader = true)
         {
-            var httpContext = HttpContext.Current;
-            if (httpContext == null)
-                return false;
+            var token = GetToken(isTokenInHttpHeader);
+            if (token == null) return false;
 
-            var request = httpContext.Request;
-            var token = string.Empty;
-
-
-            if (isTokenInHttpHeader)
-            {
-                if (!request.Headers.AllKeys.Any(h => h.Equals(HttpHeaderName, StringComparison.OrdinalIgnoreCase)) || // Ensure authorization is an http header
-                    new[] { "HEAD", "OPTIONS", "TRACE" }.Any(m => m.Equals(request.HttpMethod, StringComparison.OrdinalIgnoreCase)))  // Ensure request is not a cors request or trace request
-                {
-                    return false;
-                }
-
-                token = request.Headers[HttpHeaderName];
-            }
-            else
-            {
-                if (!request.Cookies.AllKeys.Any(c => c.Equals(TokenName, StringComparison.OrdinalIgnoreCase)))
-                    return false;
-
-                var decodedRawToken = httpContext.Server.UrlDecode(request.Cookies[TokenName].Value);
-
-                var rawToken = JsonConvert.DeserializeObject<dynamic>(decodedRawToken, _serializerSettings);
-
-                if (rawToken != null && rawToken.token != null && string.IsNullOrEmpty(rawToken.token.ToString()))
-                    return false;
-                
-                token = rawToken.token;
-            }
-            
             return Authorize(token, abilities);
         }
 
@@ -185,6 +163,61 @@ namespace Streamline.Pims.Security.Client
             authorizationRequest.abilities = abilities;
 
             return PerformAuthorizationRequest(authorizationRequest, ActiveDirectoryAuthorizationUrl);
+        }
+
+        public IUser GetCurrentUser(bool isTokenInHttpHeader = true)
+        {
+            IUser user = null;
+            var token = GetToken(isTokenInHttpHeader);
+            if (token == null) return null;
+
+            var uri = new Uri(string.Format("{0}/user/{1}", UsersUrl, token)); 
+            uri.MakeResourceRequest()
+                .HttpGet((exception, response) =>
+                         {
+                             if (response != null && response.StatusCode == HttpStatusCode.OK)
+                                 user = response.DeserializeResponse<IUser>();
+                         });
+            return user;
+        }
+
+
+        private string GetToken(bool isTokenInHttpHeader = true)
+        {
+            var httpContext = HttpContext.Current;
+            if (httpContext == null)
+                return null;
+
+            var request = httpContext.Request;
+            var token = string.Empty;
+
+
+            if (isTokenInHttpHeader)
+            {
+                if (!request.Headers.AllKeys.Any(h => h.Equals(HttpHeaderName, StringComparison.OrdinalIgnoreCase)) || // Ensure authorization is an http header
+                    new[] { "HEAD", "OPTIONS", "TRACE" }.Any(m => m.Equals(request.HttpMethod, StringComparison.OrdinalIgnoreCase)))  // Ensure request is not a cors request or trace request
+                {
+                    return null;
+                }
+
+                token = request.Headers[HttpHeaderName];
+            }
+            else
+            {
+                if (!request.Cookies.AllKeys.Any(c => c.Equals(TokenName, StringComparison.OrdinalIgnoreCase)))
+                    return null;
+
+                var decodedRawToken = httpContext.Server.UrlDecode(request.Cookies[TokenName].Value);
+
+                var rawToken = JsonConvert.DeserializeObject<dynamic>(decodedRawToken, _serializerSettings);
+
+                if (rawToken != null && rawToken.token != null && string.IsNullOrEmpty(rawToken.token.ToString()))
+                    return null;
+
+                token = rawToken.token;
+            }
+
+            return token;
         }
 
         bool PerformAuthorizationRequest(ExpandoObject request, Uri uri)
