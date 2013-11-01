@@ -64,7 +64,7 @@ namespace Streamline.Pims.Security.Client
         /// </summary>
         /// <param name="isTokenInHttpHeader">[Optional] Determines if the token is in the http header or in cookies (Default is true)</param>
         /// <returns>The user if they are currently logged in, null if they aren't</returns>
-        IUser GetCurrentUser(bool isTokenInHttpHeader);
+        IBasicUser GetCurrentUser(bool isTokenInHttpHeader);
     }
 
     [ContainerRegister(typeof(IAuthorizationClient), RegistrationBehaviors.Default)]
@@ -165,9 +165,9 @@ namespace Streamline.Pims.Security.Client
             return PerformAuthorizationRequest(authorizationRequest, ActiveDirectoryAuthorizationUrl);
         }
 
-        public IUser GetCurrentUser(bool isTokenInHttpHeader = true)
+        public IBasicUser GetCurrentUser(bool isTokenInHttpHeader = true)
         {
-            IUser user = null;
+            IBasicUser user = null;
             var token = GetToken(isTokenInHttpHeader);
             if (token == null) return null;
 
@@ -176,7 +176,7 @@ namespace Streamline.Pims.Security.Client
                 .HttpGet((exception, response) =>
                          {
                              if (response != null && response.StatusCode == HttpStatusCode.OK)
-                                 user = response.DeserializeResponse<IUser>();
+                                 user = response.DeserializeResponse<IBasicUser>();
                          });
             return user;
         }
