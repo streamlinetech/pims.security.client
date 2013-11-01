@@ -7,7 +7,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Util;
+using FlitBit.Copy;
 using FlitBit.Core.Net;
+using FlitBit.IoC;
 using FlitBit.IoC.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -176,7 +178,10 @@ namespace Streamline.Pims.Security.Client
                 .HttpGet((exception, response) =>
                          {
                              if (response != null && response.StatusCode == HttpStatusCode.OK)
-                                 user = response.DeserializeResponse<IBasicUser>();
+                             {
+                                 dynamic dUser = response.DeserializeResponseAsDynamic();
+                                 user = Copier<IBasicUser>.CopyConstruct(dUser);
+                             }
                          });
             return user;
         }
