@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Util;
 using FlitBit.Copy;
 using FlitBit.Core.Net;
+using FlitBit.Dto.WebApi;
 using FlitBit.IoC;
 using FlitBit.IoC.Meta;
 using Newtonsoft.Json;
@@ -110,13 +111,7 @@ namespace Streamline.Pims.Security.Client
             AuthorizationUrl = ConfigurationManager.AppSettings["api_authorization"];
             UsersUrl = ConfigurationManager.AppSettings["api_users"];
 
-            _serializerSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            };
+            _serializerSettings = DefaultJsonSerializerSettings.Current;
         }
 
         public bool Authorize(IEnumerable<string> abilities, bool isTokenInHttpHeader = true)
@@ -179,8 +174,7 @@ namespace Streamline.Pims.Security.Client
                          {
                              if (response != null && response.StatusCode == HttpStatusCode.OK)
                              {
-                                 dynamic dUser = response.DeserializeResponseAsDynamic();
-                                 user = Create.AsIf<IBasicUser>(dUser);
+                                 user = response.DeserializeResponse<IBasicUser>();
                              }
                          });
             return user;
