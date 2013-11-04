@@ -23,6 +23,14 @@ namespace Streamline.Pims.Security.Client
         /// <summary>
         /// Authorizes a user, will parse the http headers and try to find a token
         /// </summary>
+        /// <param name="ability">The name of the ability</param>
+        /// <param name="isTokenInHttpHeader">[Optional] Determines if the token is in the http header or in cookies (Default is true)</param>
+        /// <returns>True if the user is in the ability, false if they aren't</returns>
+        bool Authorize(string ability, bool isTokenInHttpHeader = true);
+
+        /// <summary>
+        /// Authorizes a user, will parse the http headers and try to find a token
+        /// </summary>
         /// <param name="abilities">The names of the abilities</param>
         /// <param name="isTokenInHttpHeader">[Optional] Determines if the token is in the http header or in cookies (Default is true)</param>
         /// <returns>True if the user is in the ability, false if they aren't</returns>
@@ -32,9 +40,25 @@ namespace Streamline.Pims.Security.Client
         /// Authorize a user
         /// </summary>
         /// <param name="token">Session Token</param>
+        /// <param name="ability">The name of the ability</param>
+        /// <returns>True if the user is in the ability, false if they aren't</returns>
+        bool Authorize(string token, string ability);
+
+        /// <summary>
+        /// Authorize a user
+        /// </summary>
+        /// <param name="token">Session Token</param>
         /// <param name="abilities">The names of the abilities</param>
         /// <returns>True if the user is in the ability, false if they aren't</returns>
         bool Authorize(string token, IEnumerable<string> abilities);
+
+        /// <summary>
+        /// Authorize a user
+        /// </summary>
+        /// <param name="activeDirectoryId">The Active Directory Id</param>
+        /// <param name="ability">The name of the ability</param>
+        /// <returns>True if the user is in the ability, false if they aren't</returns>
+        bool Authorize(Guid activeDirectoryId, string ability);
 
         /// <summary>
         /// Authorize a user
@@ -51,6 +75,15 @@ namespace Streamline.Pims.Security.Client
         /// <param name="badge">The badge or security code</param>
         /// <returns>True if the user is in the ability, false if they aren't</returns>
         bool Authorize(IEnumerable<string> abilities, string badge);
+
+        /// <summary>
+        /// Authorize a user
+        /// </summary>
+        /// <param name="username">The active directory username</param>
+        /// <param name="password">The active directory password</param>
+        /// <param name="ability">The name of the ability</param>
+        /// <returns>True if the user is in the ability, false if they aren't</returns>  
+        bool Authorize(string username, string password, string ability);
 
         /// <summary>
         /// Authorize a user
@@ -129,11 +162,21 @@ namespace Streamline.Pims.Security.Client
             };
         }
 
+        public bool Authorize(string ability, bool isTokenInHttpHeader = true)
+        {
+            return Authorize(new[] {ability}, isTokenInHttpHeader);
+        }
+
         public bool Authorize(IEnumerable<string> abilities, bool isTokenInHttpHeader = true)
         {
             var token = GetToken(isTokenInHttpHeader);
 
             return Authorize(token, abilities);
+        }
+
+        public virtual bool Authorize(string token, string ability)
+        {
+            return Authorize(token, new[] {ability});
         }
 
         public virtual bool Authorize(string token, IEnumerable<string> abilities)
@@ -156,6 +199,11 @@ namespace Streamline.Pims.Security.Client
             return PerformAuthorizationRequest(authorizationRequest, ActiveDirectoryAuthorizationUrl);
         }
 
+        public virtual bool Authorize(Guid activeDirectoryId, string ability)
+        {
+            return Authorize(activeDirectoryId, new[] {ability});
+        }
+
         public virtual bool Authorize(IEnumerable<string> abilities, string badge)
         {
             dynamic authorizationRequest = new ExpandoObject();
@@ -163,6 +211,11 @@ namespace Streamline.Pims.Security.Client
             authorizationRequest.abilities = abilities;
 
             return PerformAuthorizationRequest(authorizationRequest, SecurityBadgeAuthorizationUrl);
+        }
+
+        public virtual bool Authorize(string username, string password, string ability)
+        {
+            return Authorize(username, password, new[] {ability});
         }
 
         public virtual bool Authorize(string username, string password, IEnumerable<string> abilities)
