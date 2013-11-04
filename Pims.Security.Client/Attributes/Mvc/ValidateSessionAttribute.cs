@@ -23,11 +23,9 @@ namespace Streamline.Pims.Security.Client.Attributes.Mvc
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            var parsedAbilities = !string.IsNullOrEmpty(Ability) ?
-                 Ability.Split(new char[','], StringSplitOptions.RemoveEmptyEntries) :
-                 Enumerable.Empty<string>();
-
-            parsedAbilities = parsedAbilities.Union(Abilities);
+            var parsedAbilities = (Abilities ?? Enumerable.Empty<string>()).ToList();
+            if (!string.IsNullOrEmpty(Ability))
+                parsedAbilities.AddRange(Ability.Split(new char[','], StringSplitOptions.RemoveEmptyEntries));
 
             if (!AuthorizationClient.Authorize(parsedAbilities, false))
                 filterContext.Result = new RedirectResult(_redirectUrl);

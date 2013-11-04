@@ -16,16 +16,15 @@ namespace Streamline.Pims.Security.Client.Attributes.WebApi
         public string Ability { get; set; }
         public IEnumerable<string> Abilities { get; set; }
         
-        IEnumerable<string> ParsedAbilities { get; set; }
+        List<string> ParsedAbilities { get; set; }
 
         public ValidateSessionAttribute()
         {
             //ApplicationId = Guid.Parse(applicationId);
-            ParsedAbilities = !string.IsNullOrEmpty(Ability) ?
-                Ability.Split(new char[','], StringSplitOptions.RemoveEmptyEntries) :
-                Enumerable.Empty<string>();
 
-            ParsedAbilities = ParsedAbilities.Union(Abilities);
+            ParsedAbilities = (Abilities ?? Enumerable.Empty<string>()).ToList();
+            if(!string.IsNullOrEmpty(Ability))
+                ParsedAbilities.AddRange(Ability.Split(new char[','], StringSplitOptions.RemoveEmptyEntries));
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
