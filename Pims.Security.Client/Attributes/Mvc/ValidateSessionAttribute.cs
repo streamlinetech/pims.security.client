@@ -10,10 +10,10 @@ namespace Streamline.Pims.Security.Client.Attributes.Mvc
     public class ValidateSessionAttribute : ActionFilterAttribute
     {
         readonly string _redirectUrl;
-        public string Abilities { get; set; }
-
+        public string Ability { get; set; }
+        public IEnumerable<string> Abilities { get; set; }
+        
         IAuthorizationClient AuthorizationClient { get; set; }
-
 
         public ValidateSessionAttribute(string redirectUrl)
         {
@@ -23,11 +23,13 @@ namespace Streamline.Pims.Security.Client.Attributes.Mvc
 
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            var abilities = !string.IsNullOrEmpty(Abilities) ?
-                 Abilities.Split(new char[','], StringSplitOptions.RemoveEmptyEntries) :
+            var parsedAbilities = !string.IsNullOrEmpty(Ability) ?
+                 Ability.Split(new char[','], StringSplitOptions.RemoveEmptyEntries) :
                  Enumerable.Empty<string>();
 
-            if (!AuthorizationClient.Authorize(abilities, false))
+            parsedAbilities = parsedAbilities.Union(Abilities);
+
+            if (!AuthorizationClient.Authorize(parsedAbilities, false))
                 filterContext.Result = new RedirectResult(_redirectUrl);
         }
     }

@@ -12,17 +12,20 @@ namespace Streamline.Pims.Security.Client.Attributes.WebApi
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class ValidateSessionAttribute : ActionFilterAttribute
     {
-        public string Abilities { get; set; }
         public Guid ApplicationId { get; set; }
-
+        public string Ability { get; set; }
+        public IEnumerable<string> Abilities { get; set; }
+        
         IEnumerable<string> ParsedAbilities { get; set; }
 
         public ValidateSessionAttribute()
         {
             //ApplicationId = Guid.Parse(applicationId);
-            ParsedAbilities = !string.IsNullOrEmpty(Abilities) ?
-                Abilities.Split(new char[','], StringSplitOptions.RemoveEmptyEntries) :
+            ParsedAbilities = !string.IsNullOrEmpty(Ability) ?
+                Ability.Split(new char[','], StringSplitOptions.RemoveEmptyEntries) :
                 Enumerable.Empty<string>();
+
+            ParsedAbilities = ParsedAbilities.Union(Abilities);
         }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
