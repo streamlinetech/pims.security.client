@@ -72,6 +72,17 @@ namespace Streamline.Pims.Security.Client
     [ContainerRegister(typeof(IAuthorizationClient), RegistrationBehaviors.Default)]
     public class AuthorizationClient : IAuthorizationClient
     {
+        // need this for easier deserialization
+        private class BasicUser : IBasicUser
+        {
+            public Guid Id { get; set; }
+            public string UserName { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+            public dynamic StinvUser { get; set; }
+        }
+
         const string TokenName = "token";
         const string HttpHeaderName = "Authorization";
 
@@ -79,7 +90,6 @@ namespace Streamline.Pims.Security.Client
         public string UsersUrl { get; private set; }
         
         readonly JsonSerializerSettings _serializerSettings;
-        
 
         public virtual Uri ActiveDirectoryAuthorizationUrl
         {
@@ -122,7 +132,6 @@ namespace Streamline.Pims.Security.Client
         public bool Authorize(IEnumerable<string> abilities, bool isTokenInHttpHeader = true)
         {
             var token = GetToken(isTokenInHttpHeader);
-            if (token == null) return false;
 
             return Authorize(token, abilities);
         }
@@ -194,8 +203,7 @@ namespace Streamline.Pims.Security.Client
                 return null;
 
             var request = httpContext.Request;
-            var token = string.Empty;
-
+            string token;
 
             if (isTokenInHttpHeader)
             {
