@@ -179,8 +179,8 @@ namespace Streamline.Pims.Security.Client
                          {
                              if (response != null && response.StatusCode == HttpStatusCode.OK)
                              {
-                                 dynamic dUser = response.DeserializeResponseAsDynamic();
-                                 user = Create.AsIf<IBasicUser>(dUser);
+                                 string sUser = response.GetResponseBodyAsString();
+                                 user = JsonConvert.DeserializeObject<BasicUser>(sUser, _serializerSettings);
                              }
                          });
             return user;
