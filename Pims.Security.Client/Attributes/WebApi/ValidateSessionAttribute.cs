@@ -44,7 +44,7 @@ namespace Streamline.Pims.Security.Client.Attributes.WebApi
                             var isAuthorized = authorizationClient.Authorize(sessionToken, ParsedAbilities);
                             if (!isAuthorized)
                             {
-                                actionContext.Response = request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Token not found");
+                                actionContext.Response = request.CreateErrorResponse(HttpStatusCode.Unauthorized, "Unauthorized");
                                 return;
                             }
                             return;

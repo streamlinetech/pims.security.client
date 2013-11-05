@@ -28,7 +28,16 @@ namespace Streamline.Pims.Security.Client.Attributes.Mvc
                 parsedAbilities.AddRange(Ability.Split(new char[','], StringSplitOptions.RemoveEmptyEntries));
 
             if (!AuthorizationClient.Authorize(parsedAbilities, false))
-                filterContext.Result = new RedirectResult(_redirectUrl);
+            {
+                if (filterContext.HttpContext.Request.IsAjaxRequest())
+                {
+                    filterContext.Result = new HttpUnauthorizedResult();
+                }
+                else
+                {
+                    filterContext.Result = new RedirectResult(_redirectUrl);
+                }
+            }
         }
     }
 }
