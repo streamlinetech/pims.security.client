@@ -193,7 +193,7 @@ namespace Streamline.Pims.Security.Client
         public virtual bool Authorize(Guid activeDirectoryId, IEnumerable<string> abilities)
         {
             dynamic authorizationRequest = new ExpandoObject();
-            authorizationRequest.activeDiretoryId = activeDirectoryId;
+            authorizationRequest.activeDirectoryId = activeDirectoryId;
             authorizationRequest.abilities = abilities;
 
             return PerformAuthorizationRequest(authorizationRequest, ActiveDirectoryAuthorizationUrl);
